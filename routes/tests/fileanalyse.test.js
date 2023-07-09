@@ -10,15 +10,9 @@ describe("POST /api/fileanalyse", () => {
 
   let filePath = `routes/tests/${fileName}`;
 
-  beforeEach(() => {
-    fs.writeFileSync(filePath, fileContent);
-  });
-
-  afterEach(() => {
-    fs.unlinkSync(filePath);
-  });
-
   it("should upload a file and verify their returned properties", async () => {
+    fs.writeFileSync(filePath, fileContent);
+
     const response = await request(app)
       .post("/api/fileanalyse")
       .attach("upfile", filePath, {
@@ -30,5 +24,14 @@ describe("POST /api/fileanalyse", () => {
     expect(response.body).toHaveProperty("name", fileName);
     expect(response.body).toHaveProperty("type", mimeType);
     expect(response.body).toHaveProperty("size", fileContent.length);
+
+    fs.unlinkSync(filePath);
+  });
+
+  it("should return an error for invalid input", async () => {
+    const response = await request(app).post("/api/fileanalyse").send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("error");
   });
 });
