@@ -19,9 +19,19 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
+app.get("/api/hello", function (req, res) {
+  res.json({ greeting: "hello API" });
+});
+
 app.use('/api/fileanalyse', fileanalyse);
 
 const port = process.env.PORT || 3000;
-const server = app.listen(port, () => {
-  console.log('Your app is listening on port ' + port);
-});
+let server = app;
+
+if (process.env.NODE_ENV !== "test") {
+  server = app.listen(port, () => {
+    console.log("Your app is listening on port " + port);
+  });
+}
+
+export default server;
